@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # -*- coding:utf-8 -*-
-# @Time  : 2019/12/3 7:15 下午
-# @Author: wuchenglong
+# @Time  : 2020/6/5
+# @Author: fanfeiyang
 
 
 import tensorflow as tf
@@ -21,7 +21,7 @@ class NerModel(tf.keras.Model):
         self.dense = tf.keras.layers.Dense(label_size)
 
         #                                     trainable=False)
-        self.transition_params = tf.Variable(tf.random.uniform(shape=(label_size, label_size)), name='params')
+        self.transition_params = tf.Variable(tf.random.uniform(shape=(label_size, label_size)))
         self.dropout = tf.keras.layers.Dropout(0.5)
 
     # @tf.function
