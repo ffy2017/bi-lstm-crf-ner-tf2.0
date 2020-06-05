@@ -20,12 +20,13 @@ class NerModel(tf.keras.Model):
         self.biLSTM = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(hidden_num, return_sequences=True))
         self.dense = tf.keras.layers.Dense(label_size)
 
-        self.transition_params = tf.Variable(tf.random.uniform(shape=(label_size, label_size)),
-                                             trainable=False)
+        #                                     trainable=False)
+        self.transition_params = tf.Variable(tf.random.uniform(shape=(label_size, label_size)), name='params')
         self.dropout = tf.keras.layers.Dropout(0.5)
 
     # @tf.function
     def call(self, text,labels=None,training=None):
+        #text_lens是mask
         text_lens = tf.math.reduce_sum(tf.cast(tf.math.not_equal(text, 0), dtype=tf.int32), axis=-1)
         # -1 change 0
         inputs = self.embedding(text)
@@ -34,8 +35,7 @@ class NerModel(tf.keras.Model):
 
         if labels is not None:
             label_sequences = tf.convert_to_tensor(labels, dtype=tf.int32)
-            log_likelihood, self.transition_params = tf_ad.text.crf_log_likelihood(logits, label_sequences, text_lens)
-            self.transition_params = tf.Variable(self.transition_params, trainable=False)
+            log_likelihood,_ = tf_ad.text.crf_log_likelihood(logits, label_sequences, text_lens, self.transition_params)
             return logits, text_lens, log_likelihood
         else:
             return logits, text_lens
